@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="attachments" version="2.5" method="upgrade">
+    <name>plg_attachments_for_simplecalendar</name>
+    <version>3.0</version>
+    <creationDate>July 7, 2013</creationDate>
+    <author>Fabrizio Albonico</author>
+    <authorEmail>software@albonico.ch</authorEmail>
+    <authorUrl>http://software.albonico.ch/</authorUrl>
+    <copyright>(C) 2009-2013 Fabrizio Albonico. All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
+    <description>ATTACH_ATTACHMENTS_FOR_SIMPLECALENDAR_PLUGIN_DESCRIPTION</description>
+
+    <files>
+        <filename plugin="attachments_for_simplecalendar">attachments_for_simplecalendar.php</filename>
+	<filename>index.html</filename>
+	<folder>language</folder>
+    </files>
+
+</extension>
