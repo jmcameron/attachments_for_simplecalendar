@@ -86,8 +86,8 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 // 		// Handle category calls
 		if (($view == 'category') && (get_class($parent) == 'JTableContent'))
 		{
-// 			return 'category';
-			return false;
+			return 'category';
+// 			return false;
 		}
 
 		// Handle everything else (events)
@@ -683,6 +683,9 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 	 */
 	public function attachmentsHiddenForParent(&$parent, $parent_id, $parent_entity)
 	{
+		$app = JFactory::getApplication('site');
+// 		$params = $app->getParams();
+		
 		// Check for generic options
 		if (parent::attachmentsHiddenForParent($parent, $parent_id, $parent_entity))
 		{
@@ -694,10 +697,13 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		$parent_entity_name = JText::_('ATTACH_' . strtoupper($parent_entity));
 
 		// Make sure we have a valid parent ID
-		if (!$parent_id && ($parent_entity == 'category'))
+		if ( $parent_entity == 'category' )
 		{
-			$parent_id = JRequest::getInt('id');
+			// No attachments on categories
+			return true;
 		}
+// 		var_dump($app->input, $parent_id);
+// 		exit;
 		if ($parent_id !== 0)
 		{
 			// Note: parent_id of 0 may be allowed for categories, so don't abort
