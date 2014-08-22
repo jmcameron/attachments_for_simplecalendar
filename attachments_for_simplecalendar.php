@@ -83,7 +83,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 	{
 		$view = JRequest::getCmd('view');
 
-// 		// Handle category calls
+ 		// Handle category calls
 		if (($view == 'category') && (get_class($parent) == 'JTableContent'))
 		{
 			return 'category';
@@ -100,135 +100,81 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		return false;
 	}
 
-	/**
-	 * Return the name of the field with the content item text
-	 *
-	 * During the display of content items (eg, events, categories), the
-	 * onContentPrepare (etc) callbacks are used to insert attachments lists.
-	 * The second argument of the onContentPrepare() function is an object
-	 * (usually $row) for the content item (eg, event).  This function will
-	 * return the appropriate field for the text of the content item.  In some
-	 * cases it is 'text', in others, 'introtext'.  Attachments plugins can
-	 * override this function to provide the field name more intelligently.
-	 *
-	 * Note: returns null if the text field is unknown/not present.
-	 *
-	 * @param   &object  &$row           the content object (eg, event) being displayed
-	 * @param   string   $parent_entity  the type of entity for this content item.
-	 *
-	 * @return string name of the text field of this content item object.
-	 */
-	protected function getTextFieldName(&$row, $parent_entity)
-	{
-		$text_field_name = parent::getTextFieldName($row, $parent_entity);
+ 	/**
+ 	 * Return an array of entity items (with id,title pairs for each item)
+ 	 *
+ 	 * @param   string  $parent_entity  the type of entity to search for
+ 	 * @param   string  $filter         filter the results for matches for this filter string
+ 	 *
+ 	 * @return the array of entity id,title pairs
+ 	 */
+ 	public function getEntityItems($parent_entity = 'default', $filter = '')
+ 	{
+		// The default(event) is handled cleanly by the base class
+		if ( $parent_entity == 'default' OR $parent_entity == 'event' ) {
+			return parent::getEntityItems($parent_entity, $filter);
+			}
 
-// 		// In the case of a blog, we know what text_field_name should be
-// 		if (isset($row->introtext) AND (JRequest::getCmd('layout') == 'blog'))
-// 		{
-// 			$text_field_name = 'introtext';
-// 		}
-
-// 		// Featured also uses 'introtext'
-// 		if (isset($row->introtext) AND (JRequest::getCmd('view') == 'featured'))
-// 		{
-// 			$text_field_name = 'introtext';
-// 		}
-// 		$text_field_name = 'description';
-		return $text_field_name;
-	}
-
-	/**
-	 * Return the URL that can be called to select a specific content item.
-	 *
-	 * @param   string  $parent_entity  the type of entity to select from
-	 *
-	 * @return the URL that can be called to select a specific content item
-	 */
-	public function getSelectEntityURL($parent_entity = 'default')
-	{
-		$parent_entity = $this->getCanonicalEntityId($parent_entity);
-
-		switch ($parent_entity)
-		{
-
-// 			case 'category':
-// 				return parent::getSelectEntityURL($parent_entity);
-// 				break;
-
-			default:
-				return "index.php?option=com_simplecalendar&amp;view=events&amp;layout=modal&amp;tmpl=component&amp;function=jSelectevent";
-		}
-	}
-
-	/**
-	 * Return an array of entity items (with id,title pairs for each item)
-	 *
-	 * @param   string  $parent_entity  the type of entity to search for
-	 * @param   string  $filter         filter the results for matches for this filter string
-	 *
-	 * @return the array of entity id,title pairs
-	 */
-	public function getEntityItems($parent_entity = 'default', $filter = '')
-	{
-		$db = JFactory::getDBO();
-
-		$parent_entity      = $this->getCanonicalEntityId($parent_entity);
-		$parent_entity_name = JText::_('ATTACH_' . $parent_entity);
-
+ 		$db = JFactory::getDBO();
+ 
+ 		$parent_entity      = $this->getCanonicalEntityId($parent_entity);
+ 		$parent_entity_name = JText::_('ATTACH_' . $parent_entity);
+ 
 		// Note that event is handled separately
 		if (JString::strtolower($parent_entity) != 'category')
 		{
-			$errmsg = JText::sprintf('ATTACH_ERROR_GETTING_LIST_OF_ENTITY_S_ITEMS', $parent_entity_name) . ' (ERR 400)';
+			$errmsg = JText::sprintf('ATTACH_ERROR_GETTING_LIST_OF_ENTITY_S_ITEMS', $parent_entity_name) . ' (ERR 1400)';
 			JError::raiseError(500, $errmsg);
 		}
-
-		$entity_table       = $this->entity_table[$parent_entity];
-		$entity_title_field = $this->entity_title_field[$parent_entity];
-		$entity_id_field    = $this->entity_id_field[$parent_entity];
-
-		// Get the ordering information
-		$app       = JFactory::getApplication();
-		$order     = $app->getUserStateFromRequest('com_attachments.selectEntity.filter_order', 'filter_order', '', 'cmd');
-		$order_Dir = $app->getUserStateFromRequest('com_attachments.selectEntity.filter_order_Dir', 'filter_order_Dir', '', 'word');
-
-		// Get all the items
-		$query = $db->getQuery(true);
-		$query->select('*')->from('#__categories');
-
-		// Filter
-		if ($filter)
-		{
-			$filter = $db->quote('%' . $db->escape($filter, true) . '%', false);
-			$query->where('title LIKE ' . $filter);
-		}
-		$query->where('extension=' . $db->quote('com_simplecalendar'));
-
-		// NOTE: Ignore any requested order since only ordering by lft makes the hierarchy work
-		$query->order('lft');
-
-		// Do the query
-		$db->setQuery($query);
-		$items = $db->loadObjectList();
-		if ($db->getErrorNum())
-		{
-			$errmsg = JText::sprintf('ATTACH_ERROR_GETTING_LIST_OF_ENTITY_S_ITEMS', $parent_entity_name) . ' (ERR 401) <br/>' . $db->stderr();
-			JError::raiseError(500, $errmsg);
-		}
-
-		if ($items == null)
-		{
-			return null;
-		}
-
-		// Set up the hierarchy indenting
-		foreach ($items as &$item)
-		{
-			$repeat      = ($item->level - 1 >= 0) ? $item->level - 1 : 0;
-			$item->title = str_repeat('- ', $repeat) . $item->title;
-		}
-
-		return $items;
-	}
+ 
+ 		$entity_table       = $this->entity_table[$parent_entity];
+ 		$entity_title_field = $this->entity_title_field[$parent_entity];
+ 		$entity_id_field    = $this->entity_id_field[$parent_entity];
+ 
+ 		// Get the ordering information
+ 		$app       = JFactory::getApplication();
+ 		$order     = $app->getUserStateFromRequest('com_attachments.selectEntity.filter_order', 'filter_order', '', 'cmd');
+ 		$order_Dir = $app->getUserStateFromRequest('com_attachments.selectEntity.filter_order_Dir', 'filter_order_Dir', '', 'word');
+ 
+ 		// Get all the items
+ 		$query = $db->getQuery(true);
+ 		$query->select('*')->from('#__categories');
+ 
+ 		// Filter
+ 		if ($filter)
+ 		{
+ 			$filter = $db->quote('%' . $db->escape($filter, true) . '%', false);
+ 			$query->where('title LIKE ' . $filter);
+ 		}
+ 		$query->where('extension=' . $db->quote('com_simplecalendar'));
+ 
+ 		// NOTE: Ignore any requested order since only ordering by lft makes the hierarchy work
+ 		$query->order('lft');
+ 
+ 		// Do the query
+ 		$db->setQuery($query);
+ 		$items = $db->loadObjectList();
+ 		if ($db->getErrorNum())
+ 		{
+ 			$errmsg = JText::sprintf('ATTACH_ERROR_GETTING_LIST_OF_ENTITY_S_ITEMS', $parent_entity_name) .
+ 				                     ' (ERR 1401) <br/>' . $db->stderr();
+ 			JError::raiseError(500, $errmsg);
+ 		}
+ 
+ 		if ($items == null)
+ 		{
+ 			return null;
+ 		}
+ 
+ 		// Set up the hierarchy indenting
+ 		foreach ($items as &$item)
+ 		{
+ 			$repeat      = ($item->level - 1 >= 0) ? $item->level - 1 : 0;
+ 			$item->title = str_repeat('- ', $repeat) . $item->title;
+ 		}
+ 
+ 		return $items;
+ 	}
 
 	/**
 	 * Return the ID of the creator/owner of the parent entity
@@ -257,7 +203,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 // 				$result = $db->loadResult();
 // 				if ($db->getErrorNum())
 // 				{
-// 					$errmsg = JText::_('ATTACH_ERROR_CHECKING_CATEGORY_PERMISSIONS') . ' (ERR 402)';
+// 					$errmsg = JText::_('ATTACH_ERROR_CHECKING_CATEGORY_PERMISSIONS') . ' (ERR 1402)';
 // 					JError::raiseError(500, $errmsg);
 // 				}
 // 				break;
@@ -268,7 +214,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 				$result = $db->loadResult();
 				if ($db->getErrorNum())
 				{
-					$errmsg = JText::_('ATTACH_ERROR_CHECKING_EVENT_PERMISSIONS') . ' (ERR 403)';
+					$errmsg = JText::_('ATTACH_ERROR_CHECKING_EVENT_PERMISSIONS') . ' (ERR 1403)';
 					JError::raiseError(500, $errmsg);
 				}
 		}
@@ -414,7 +360,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 // 				$obj = $db->loadObject();
 // 				if ($db->getErrorNum())
 // 				{
-// 					$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 404)';
+// 					$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1404)';
 // 					JError::raiseError(500, $errmsg);
 // 				}
 // 				if (is_object($obj))
@@ -437,7 +383,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 				$event = $db->loadObject();
 				if ($db->getErrorNum())
 				{
-					$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 405)';
+					$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1405)';
 					JError::raiseError(500, $errmsg);
 				}
 				else
@@ -495,7 +441,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 				if ($db->getErrorNum())
 				{
 					$parent_entity_name = JText::_('ATTACH_' . $parent_entity);
-					$errmsg             = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 406)';
+					$errmsg             = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1406)';
 					JError::raiseError(500, $errmsg);
 				}
 				else
@@ -617,7 +563,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		}
 		else
 		{
-			$errmsg = JText::sprintf('ATTACH_ERROR_UNRECOGNIZED_PARENT_STATE_S', $parent_state) . ' (ERR 407)';
+			$errmsg = JText::sprintf('ATTACH_ERROR_UNRECOGNIZED_PARENT_STATE_S', $parent_state) . ' (ERR 1407)';
 			JError::raiseError(500, $errmsg);
 		}
 
@@ -666,7 +612,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		if ($db->getErrorNum())
 		{
 			$parent_entity_name = JText::_('ATTACH_' . strtoupper($parent_entity));
-			$errmsg             = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 408)';
+			$errmsg             = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1408)';
 			JError::raiseError(500, $errmsg);
 		}
 
@@ -709,7 +655,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 			// Note: parent_id of 0 may be allowed for categories, so don't abort
 			if (($parent_id == null) || ($parent_id == '') || !is_numeric($parent_id))
 			{
-				$errmsg = JText::sprintf('ATTACH_ERROR_BAD_ENTITY_S_ID', $parent_entity_name) . ' (ERR 409)';
+				$errmsg = JText::sprintf('ATTACH_ERROR_BAD_ENTITY_S_ID', $parent_entity_name) . ' (ERR 1409)';
 				JError::raiseError(500, $errmsg);
 			}
 		}
@@ -775,7 +721,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 			$attachments = $db->loadObjectList();
 			if ($db->getErrorNum() || (count($attachments) == 0))
 			{
-				$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 410)';
+				$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1410)';
 				JError::raiseError(500, $errmsg);
 			}
 
@@ -1150,6 +1096,68 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		$user = JFactory::getUser($user_id);
 		return in_array($attachment->access, $user->getAuthorisedViewLevels());
 	}
+
+	/** See if the attachments list should be displayed in its content description editor
+	 *
+	 * @param   string  $parent_entity  the type of entity for this parent type
+	 * @param   string  $view           the view
+	 * @param   string  $layout         the layout on the view
+	 *
+	 * @return  true if the attachments list should be added to the editor
+	 */
+	public function showAttachmentsInEditor($parent_entity, $view, $layout)
+	{
+		$app = JFactory::getApplication();
+		if ($app->isAdmin())
+		{
+			return ($view == 'event') AND ($layout =='edit');
+		}
+		else
+		{
+			return ($view == 'form') AND (($layout =='list') OR ($layout='edit'));
+		}
+	}
+
+
+	/** Get the parent_id in the component content item editor
+	 *  (the article or category editor)
+	 *
+	 * @param  string  $parent_entity  the type of entity for this parent type
+	 *
+	 * @return the parent ID, null if the content item is being created, and false if there is no match
+	 *
+	 * @since    Attachments 3.2
+	 */
+	public function getParentIdInEditor($parent_entity, $view, $layout)
+	{
+		$app = JFactory::getApplication();
+		if ($app->isAdmin()) {
+			// The default works fine for the back end
+			return parent::getParentIdInEditor($parent_entity, $view, $layout);
+			}
+		// Note categories cannot be created or edited from the frontend
+		if ($parent_entity == 'category') {
+			return false;
+			}
+
+		// Deal with articles (in frontend)
+		$id = null;
+		if (($view == 'event') OR ($view == 'form')) {
+			$id = JRequest::getInt('id', $default=null);
+			}
+		else {
+			$id = false;
+			}
+
+		// If we got one, convert it to an int
+		if (is_numeric($id)) {
+			$id = (int)$id;
+			}
+
+		return $id;
+	}
+
+
 }
 
 
