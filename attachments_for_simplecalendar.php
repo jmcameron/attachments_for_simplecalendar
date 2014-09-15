@@ -58,12 +58,13 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		$this->entity_id_field['event']    	= 'id';
 		$this->entity_title_field['event'] 	= 'name';
 
-		// Add information about the category description entity
-		$this->entities[]                     = 'category';
-		$this->entity_name['category']        = 'category';
-		$this->entity_table['category']       = 'categories';
-		$this->entity_id_field['category']    = 'id';
-		$this->entity_title_field['category'] = 'title';
+		// ??? DISABLE CATEGORIES for now
+		// ??? 	// Add information about the category description entity
+		// ??? 	$this->entities[]                     = 'category';
+		// ??? 	$this->entity_name['category']        = 'category';
+		// ??? 	$this->entity_table['category']       = 'categories';
+		// ??? 	$this->entity_id_field['category']    = 'id';
+		// ??? 	$this->entity_title_field['category'] = 'title';
 
 		// Always load the language
 		$this->loadLanguage();
@@ -84,10 +85,10 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		$view = JRequest::getCmd('view');
 
  		// Handle category calls
+		// ??? Harmless until we enable categories
 		if (($view == 'category') && (get_class($parent) == 'JTableContent'))
 		{
 			return 'category';
-// 			return false;
 		}
 
 		// Handle everything else (events)
@@ -121,6 +122,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
  		$parent_entity_name = JText::_('ATTACH_' . $parent_entity);
  
 		// Note that event is handled separately
+		// ??? Harmless for now
 		if (JString::strtolower($parent_entity) != 'category')
 		{
 			$errmsg = JText::sprintf('ATTACH_ERROR_GETTING_LIST_OF_ENTITY_S_ITEMS', $parent_entity_name) . ' (ERR 1400)';
@@ -197,16 +199,17 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		switch ($parent_entity)
 		{
 
-// 			case 'category':
-// 				$query->select('created_user_id')->from('#__categories')->where('id = ' . (int) $parent_id);
-// 				$db->setQuery($query, 0, 1);
-// 				$result = $db->loadResult();
-// 				if ($db->getErrorNum())
-// 				{
-// 					$errmsg = JText::_('ATTACH_ERROR_CHECKING_CATEGORY_PERMISSIONS') . ' (ERR 1402)';
-// 					JError::raiseError(500, $errmsg);
-// 				}
-// 				break;
+			// ??? Disabled
+			// 	case 'category':
+			// 		$query->select('created_user_id')->from('#__categories')->where('id = ' . (int) $parent_id);
+			// 		$db->setQuery($query, 0, 1);
+			// 		$result = $db->loadResult();
+			// 		if ($db->getErrorNum())
+			// 		{
+			// 			$errmsg = JText::_('ATTACH_ERROR_CHECKING_CATEGORY_PERMISSIONS') . ' (ERR 1402)';
+			// 			JError::raiseError(500, $errmsg);
+			// 		}
+			// 		break;
 
 			default: // event
 				$query->select('created_by')->from('#__simplecalendar')->where('id = ' . (int) $parent_id);
@@ -244,10 +247,10 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		// Return the right thing for each entity
 		switch ($parent_entity)
 		{
-
-// 			case 'category':
-// 				return $base_url . 'index.php?option=com_simplecalendar&view=calendar&id=' . $parent_id;
-// 				break;
+			// ??? This should eventually work (harmless for now)
+			case 'category':
+				return $base_url . 'index.php?option=com_simplecalendar&view=events&catid[]=' . $parent_id;
+				break;
 
 			default:
 				return $base_url . 'index.php?option=com_simplecalendar&view=event&id=' . $parent_id;
@@ -293,10 +296,10 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		// Build the right URL for each entity
 		switch ($parent_entity)
 		{
-
-// 			case 'category':
-// 				$url .= "&parent_type=com_simplecalendar.$parent_entity&from=$from";
-// 				break;
+			// ??? NOT IMPLEMENTED FOR CATEGORY YET
+			// case 'category':
+			// 				$url .= "&parent_type=com_simplecalendar.$parent_entity&from=$from";
+			// 				break;
 
 			default:
 				$url .= "&parent_type=com_simplecalendar.event&from=$from";
@@ -323,10 +326,11 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 			return true;
 		}
 
-// 		if (($parent_entity == 'category') && ($parent_entity == $rtitle_parent_entity))
-// 		{
-// 			return true;
-// 		}
+		// ??? CATEGORY NOT IMPLEMENTED YET
+		//  if (($parent_entity == 'category') && ($parent_entity == $rtitle_parent_entity))
+		//  {
+		//   	return true;
+		//  }
 
 		return false;
 	}
@@ -351,120 +355,62 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		// Return the right thing for each entity
 		switch ($parent_entity)
 		{
+			// ??? Not implemented yet for categories
+			// 	case 'category':
+			// 		$entity_table = $this->entity_table[$parent_entity];
+			// 		$query        = $db->getQuery(true);
+			// 		$query->select('published')->from("#__$entity_table")->where('id = ' . (int) $parent_id);
+			// 		$db->setQuery($query, 0, 1);
+			// 		$obj = $db->loadObject();
+			// 		if ($db->getErrorNum())
+			// 		{
+			// 			$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1404)';
+			// 			JError::raiseError(500, $errmsg);
+			// 		}
+			// 		if (is_object($obj))
+			// 		{
+			// 			$published = $obj->published == 1;
+			// 		}
+			// 		else
+			// 		{
+			// 			$published = false;
+			// 		}
+			// 		break;
 
-// 			case 'category':
-// 				$entity_table = $this->entity_table[$parent_entity];
-// 				$query        = $db->getQuery(true);
-// 				$query->select('published')->from("#__$entity_table")->where('id = ' . (int) $parent_id);
-// 				$db->setQuery($query, 0, 1);
-// 				$obj = $db->loadObject();
-// 				if ($db->getErrorNum())
-// 				{
-// 					$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1404)';
-// 					JError::raiseError(500, $errmsg);
-// 				}
-// 				if (is_object($obj))
-// 				{
-// 					$published = $obj->published == 1;
-// 				}
-// 				else
-// 				{
-// 					$published = false;
-// 				}
-// 				break;
+		default:
 
-			default:
-
-				// Check for events
-				$query = $db->getQuery(true);
-				$query->select('state')->from('#__simplecalendar');
-				$query->where('id = ' . (int) $parent_id);
-				$db->setQuery($query, 0, 1);
-				$event = $db->loadObject();
-				if ($db->getErrorNum())
+			// Check the state for the event (state==1 => published)
+			$query = $db->getQuery(true);
+			$query->select('state')->from('#__simplecalendar');
+			$query->where('id = ' . (int) $parent_id);
+			$db->setQuery($query, 0, 1);
+			$event = $db->loadObject();
+			if ($db->getErrorNum())
+			{
+				$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1405)';
+				JError::raiseError(500, $errmsg);
+			}
+			else
+			{
+				if ($event)
 				{
-					$errmsg = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1405)';
-					JError::raiseError(500, $errmsg);
+					$published =  ($event->state == 1);
 				}
 				else
 				{
-					$now      = JFactory::getDate()->toUnix();
-					$nullDate = JFactory::getDate($db->getNullDate())->toUnix();
-
-					if ($event)
-					{
-// 						$publish_up   = JFactory::getDate($event->publish_up)->toUnix();
-// 						$publish_down = JFactory::getDate($event->publish_down)->toUnix();
-
-// 						$published = (($event->state == 1) && ($now >= $publish_up) && (($publish_down == $nullDate) || ($now <= $publish_down)));
-						$published =  ($event->state == 1);
-					}
-					else
-					{
-						$published = false;
-					}
+					$published = false;
 				}
+			}
 		}
 
 		return $published;
 	}
 
 	/**
-	 * Check to see if the parent is archived
-	 *
-	 * @param   int     $parent_id      is the ID for this parent object
-	 * @param   string  $parent_entity  the type of entity for this parent type
-	 *
-	 * @return true if the parent is archived
-	 */
-	public function isParentArchived($parent_id, $parent_entity = 'default')
-	{
-		$archived = false;
-
-		$parent_entity = $this->getCanonicalEntityId($parent_entity);
-
-		// Return the right thing for each entity
-		switch ($parent_entity)
-		{
-
-			case 'category':
-				// You apparently cannot archive categories
-				break;
-
-			default:
-				// events
-				$db    = JFactory::getDBO();
-				$query = $db->getQuery(true);
-				$query->select('state')->from('#__simplecalendar')->where(' id = ' . (int) $parent_id);
-				$db->setQuery($query, 0, 1);
-				$event = $db->loadObject();
-				if ($db->getErrorNum())
-				{
-					$parent_entity_name = JText::_('ATTACH_' . $parent_entity);
-					$errmsg             = JText::sprintf('ATTACH_ERROR_INVALID_PARENT_S_ID_N', $parent_entity_name, $parent_id) . ' (ERR 1406)';
-					JError::raiseError(500, $errmsg);
-				}
-				else
-				{
-					if ($event)
-					{
-						$archived = $event->state == -1;
-					}
-					else
-					{
-						$archived = false;
-					}
-				}
-		}
-
-		return $archived;
-	}
-
-	/**
 	 * Return a string of the where clause for filtering the the backend list of attachments
 	 *
 	 * @param   string  $parent_state   the state ('ALL', 'PUBLISHED', 'UNPUBLISHED', 'ARCHIVED', 'NONE')
-	 * @param   string  $filter_entity  the entity filter ('ALL', 'event', 'CATEGORY')
+	 * @param   string  $filter_entity  the entity filter ('ALL', 'EVENT', 'CATEGORY')
 	 *
 	 * @return an array of where clauses
 	 */
@@ -473,7 +419,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		// If we want all attachments, do no filtering
 		if ($parent_state == 'ALL')
 		{
-			return null;
+			return array();
 		}
 
 		$db = JFactory::getDBO();
@@ -487,14 +433,14 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		if ($parent_state == 'PUBLISHED')
 		{
 
-			if (($filter_entity == 'ALL') || ($filter_entity == 'event'))
+			if (($filter_entity == 'ALL') || ($filter_entity == 'EVENT'))
 			{
 				$now      = JFactory::getDate()->toSql();
 				$nullDate = $db->getNullDate();
 				$where[]  = "EXISTS (SELECT * FROM #__simplecalendar AS c1 " .
-					"WHERE (a.parent_entity = 'event' AND c1.id = a.parent_id AND c1.state=1 "; //.
-// 					'(c1.publish_up = ' . $db->quote($nullDate) . ' OR c1.publish_up <= ' . $db->quote($now) . ') AND ' .
-// 					'(c1.publish_down = ' . $db->quote($nullDate) . ' OR c1.publish_down >= ' . $db->quote($now) . ')))';
+					"WHERE (a.parent_entity = 'event' AND c1.id = a.parent_id AND c1.state=1 AND " .
+					'(c1.publish_up = ' . $db->quote($nullDate) . ' OR c1.publish_up <= ' . $db->quote($now) . ') AND ' .
+					'(c1.publish_down = ' . $db->quote($nullDate) . ' OR c1.publish_down >= ' . $db->quote($now) . ')))';
 			}
 
 			if (($filter_entity == 'ALL') || ($filter_entity == 'CATEGORY'))
@@ -506,13 +452,11 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		elseif ($parent_state == 'UNPUBLISHED')
 		{
 			// These WHERE clauses will be combined by OR
-			if (($filter_entity == 'ALL') || ($filter_entity == 'event'))
+			if (($filter_entity == 'ALL') || ($filter_entity == 'EVENT'))
 			{
 				$where[] = "EXISTS (SELECT * FROM #__simplecalendar AS c1 " .
 					"WHERE (a.parent_entity = 'event' AND c1.id = a.parent_id AND c1.state=0))";
 				$where[] = "(a.parent_entity = 'event' AND NOT EXISTS (select * from #__simplecalendar as c1 where c1.id = a.parent_id))";
-
-				// ??? Add clauses here to get events that are unpublished because of publish_up/publish_down
 			}
 
 			if (($filter_entity == 'ALL') || ($filter_entity == 'CATEGORY'))
@@ -525,7 +469,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		elseif ($parent_state == 'ARCHIVED')
 		{
 			// These WHERE clauses will be combined by OR
-			if (($filter_entity == 'ALL') || ($filter_entity == 'event'))
+			if (($filter_entity == 'ALL') || ($filter_entity == 'EVENT'))
 			{
 				$where[] = "EXISTS (SELECT * FROM #__simplecalendar AS c1 " .
 					"WHERE (a.parent_entity = 'event' AND c1.id = a.parent_id AND c1.state=2))";
@@ -540,7 +484,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		elseif ($parent_state == 'TRASHED')
 		{
 			// These WHERE clauses will be combined by OR
-			if (($filter_entity == 'ALL') || ($filter_entity == 'event'))
+			if (($filter_entity == 'ALL') || ($filter_entity == 'EVENT'))
 			{
 				$where[] = "EXISTS (SELECT * FROM #__simplecalendar AS c1 " .
 					"WHERE (a.parent_entity = 'event' AND c1.id = a.parent_id AND c1.state=-2))";
@@ -563,12 +507,13 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		}
 		else
 		{
-			$errmsg = JText::sprintf('ATTACH_ERROR_UNRECOGNIZED_PARENT_STATE_S', $parent_state) . ' (ERR 1407)';
+			$errmsg = JText::sprintf('ATTACH_ERROR_UNRECOGNIZED_PARENT_STATE_S', $parent_state);
 			JError::raiseError(500, $errmsg);
 		}
 
 		return $where;
 	}
+
 
 	/**
 	 * May the parent be viewed by the user?
@@ -587,10 +532,11 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		$table = null;
 		switch ($parent_entity)
 		{
-
-// 			case 'category':
-// 				$table = 'categories';
-// 				break;
+			// ??? Harmless for now
+		    case 'category':
+				return false;
+				$table = 'categories';
+				break;
 
 			default:
 				// event
@@ -630,14 +576,12 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 	public function attachmentsHiddenForParent(&$parent, $parent_id, $parent_entity)
 	{
 		$app = JFactory::getApplication('site');
-// 		$params = $app->getParams();
 		
 		// Check for generic options
 		if (parent::attachmentsHiddenForParent($parent, $parent_id, $parent_entity))
 		{
 			return true;
 		}
-		$pclass = get_class($parent);
 
 		$parent_entity      = $this->getCanonicalEntityId($parent_entity);
 		$parent_entity_name = JText::_('ATTACH_' . strtoupper($parent_entity));
@@ -645,11 +589,11 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		// Make sure we have a valid parent ID
 		if ( $parent_entity == 'category' )
 		{
-			// No attachments on categories
+			// ??? CATEGORIES NOT ENABLED YET
+			// ??? $parent_id = JRequest::getInt('catid');
 			return true;
 		}
-// 		var_dump($app->input, $parent_id);
-// 		exit;
+
 		if ($parent_id !== 0)
 		{
 			// Note: parent_id of 0 may be allowed for categories, so don't abort
@@ -661,6 +605,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		}
 
 		// Check to see if it should be hidden with readmore
+		// ??? PROBABLY NOT APPLICABLE  (JMC)
 		$aparams = $this->attachmentsParams();
 		$hide_with_readmore = $aparams->get('hide_with_readmore', false);
 		if ($hide_with_readmore && isset($parent->readmore) && $parent->readmore)
@@ -676,7 +621,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 
 		if ($parent_entity == 'category')
 		{
-// 			// Handle categories
+ 			// ??? Handle categories (harmless for now)
 			$always_show_category_attachments = $aparams->get('always_show_category_attachments', false);
 			if ($always_show_category_attachments)
 			{
@@ -707,7 +652,6 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		}
 		else
 		{
-
 			// Handle events
 			if ($parent_id == 0)
 			{
@@ -735,11 +679,8 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 				}
 			}
 
-			// See if the options apply to this event
-			$created_by = (int) $attachments[0]->created_by;
-			$catid      = (int) $attachments[0]->catid;
-
-			// First, check to see whether the attachments should be hidden for this parent
+			// Check to see whether the attachments should be hidden for this category
+			$catid  = (int) $attachments[0]->catid;
 			$hide_attachments_for_categories = $aparams->get('hide_attachments_for_categories', Array());
 			if (in_array($catid, $hide_attachments_for_categories))
 			{
@@ -750,6 +691,61 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		// The default is: attachments are not hidden
 		return false;
 	}
+
+
+	/**
+	 * Determine if a user can edit a specified event
+	 *
+	 * Partially based on allowEdit() in com_content/controllers/event.php
+	 *
+	 * @param  integer $event_id the ID for the event to be tested
+	 * @param  integer $id	The id of the user to load (defaults to null)
+	 */
+	public static function userMayEditEvent($event_id, $user_id = null)
+	{
+		$user = JFactory::getUser($user_id);
+
+		// Check general edit permission first.
+		if ($user->authorise('core.edit', 'com_simplecalendar')) {
+			return true;
+		}
+
+		// Check specific edit permission.
+		if ($user->authorise('core.edit', 'com_simplecalendar.event.'.$event_id)) {
+			return true;
+		}
+
+		// Check for event being created.
+		// NOTE: we must presume that the event is being created by this user!
+		if ( ((int)$event_id == 0) && $user->authorise('core.edit.own', 'com_simplecalendar') ) {
+			return true;
+			}
+
+		// No general permissions, see if 'edit own' is permitted for this event
+		if ( $user->authorise('core.edit.own', 'com_simplecalendar') ||
+			 $user->authorise('core.edit.own', 'com_simplecalendar.event.'.$event_id) ) {
+
+			// Yes user can 'edit.own', Find out if the user created the event
+			$db = JFactory::getDBO();
+			$query = $db->getQuery(true);
+			$query->select('id')->from('#__simplecalendar');
+			$query->where('id = '.(int)$event_id.' AND created_by = '.(int)$user->id);
+			$db->setQuery($query, 0, 1);
+			$results = $db->loadObject();
+			if ($db->getErrorNum()) {
+				$errmsg = JText::_('ATTACH_ERROR_CHECKING_EVENT_OWNERSHIP') . ' (ERR 107)';
+				JError::raiseError(500, $errmsg);
+				}
+
+			if ( !empty($results) ) {
+				// The user did actually create the event
+				return true;
+				}
+			}
+
+		return false;
+	}
+
 
 	/**
 	 * Return true if the user may add an attachment to this parent
@@ -775,7 +771,6 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 
 		switch ($parent_entity)
 		{
-
 			case 'category':
 
 				// First, determine if the user can edit this category
@@ -793,12 +788,12 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 				// For events
 
 				// First, determine if the user can edit this event
-				if (!AttachmentsPermissions::userMayEditArticle($parent_id))
+				if (!$this->userMayEditEvent($parent_id))
 				{
 					return false;
 				}
 
-				// Finally, see if the user has permissions to create attachments
+				// Finally, see if the user has general permissions to create attachments
 				return $user->authorise('core.create', 'com_attachments');
 		}
 
@@ -868,10 +863,10 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 			default:
 				// events
 
-				// ?? Deal with parents being created (parent_id == 0)
+				// ??? Deal with parents being created (parent_id == 0)
 
 				// First, determine if the user can edit this event
-				if (!AttachmentsPermissions::userMayEditArticle($attachment->parent_id))
+				if (!$this->userMayEditEvent($attachment->parent_id))
 				{
 					return false;
 				}
@@ -961,7 +956,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 				// ?? Deal with parents being created (parent_id == 0)
 
 				// First, determine if the user can edit this event
-				if (!AttachmentsPermissions::userMayEditArticle($attachment->parent_id))
+				if (!$this->userMayEditEvent($attachment->parent_id))
 				{
 					return false;
 				}
@@ -1056,7 +1051,7 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 				// ?? Deal with parents being created (parent_id == 0)
 
 				// First, determine if the user can edit this event
-				if (!AttachmentsPermissions::userMayEditevent($parent_id))
+				if (!$this->userMayEditEvent($parent_id))
 				{
 					return false;
 				}
