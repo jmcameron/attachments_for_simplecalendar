@@ -1,6 +1,6 @@
 # Makefile for linux
 
-VERSION = "3.1.4-Beta4"
+VERSION = "3.1.4-Beta5"
 VERSION2 = $(shell echo $(VERSION)|sed 's/ /-/g')
 ZIPFILE = plg_attachments_for_simplecalendar_$(VERSION2).zip
 
