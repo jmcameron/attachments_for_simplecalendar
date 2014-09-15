@@ -1,7 +1,7 @@
 attachments_for_simplecalendar
 ==============================
 
-WARNING: This version will only work with Attachments 3.1.4-Beta5 or later!
+WARNING: This version will only work with Attachments 3.1.4-Beta6 or later!
          If this version (or later) has not been released, please contact the
          Attachments extension Author, Jonathan M. Cameron, to obtain
          pre-release version at jmcameron@jmcameron.net.
