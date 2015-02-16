@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" group="attachments" version="2.5" method="upgrade">
     <name>plg_attachments_for_simplecalendar</name>
-    <version>3.1.4-Beta5</version>
+    <version>3.2.0</version>
     <creationDate>September 14, 2014</creationDate>
-    <author>Fabrizio Albonico</author>
+    <author>Fabrizio Albonico, Jonthan M. Cameron</author>
     <authorEmail>software@albonico.ch</authorEmail>
     <authorUrl>http://software.albonico.ch/</authorUrl>
-    <copyright>(C) 2009-2014 Fabrizio Albonico. All rights reserved.</copyright>
+    <copyright>(C) 2009-2015 Fabrizio Albonico. All rights reserved.</copyright>
     <license>http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL</license>
     <description>ATTACH_ATTACHMENTS_FOR_SIMPLECALENDAR_PLUGIN_DESCRIPTION</description>
 
