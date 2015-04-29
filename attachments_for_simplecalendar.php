@@ -58,13 +58,12 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 		$this->entity_id_field['event']    	= 'id';
 		$this->entity_title_field['event'] 	= 'name';
 
-		// ??? DISABLE CATEGORIES for now
-		// ??? 	// Add information about the category description entity
-		// ??? 	$this->entities[]                     = 'category';
-		// ??? 	$this->entity_name['category']        = 'category';
-		// ??? 	$this->entity_table['category']       = 'categories';
-		// ??? 	$this->entity_id_field['category']    = 'id';
-		// ??? 	$this->entity_title_field['category'] = 'title';
+		// Add information about the category description entity
+		$this->entities[]                     = 'category';
+		$this->entity_name['category']        = 'category';
+		$this->entity_table['category']       = 'categories';
+		$this->entity_id_field['category']    = 'id';
+		$this->entity_title_field['category'] = 'title';
 
 		// Always load the language
 		$this->loadLanguage();
@@ -424,9 +423,13 @@ class AttachmentsPlugin_Com_Simplecalendar extends AttachmentsPlugin
 
 		$db = JFactory::getDBO();
 
-		$where = Array();
+		$where = array();
 
 		$filter_entity = JString::strtoupper($filter_entity);
+
+		// ??? Disable now, fix later
+		return array();
+
 
 		// NOTE: These WHERE clauses will be combined by OR
 
