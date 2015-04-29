@@ -6,7 +6,7 @@
  * @subpackage  Attachments_Plugin_For_Simplecalendar
  *
  * @author      Fabrizio Albonico <software@albonico.ch>
- * @copyright   Copyright (C) 2009-2013 Fabrizio Albonico, All Rights Reserved
+ * @copyright   Copyright (C) 2009-2015 Fabrizio Albonico, All Rights Reserved
  * @license     http://www.gnu.org/licenses/gpl-3.0.html GNU/GPL
  * @link        http://software.albonico.ch
  */
